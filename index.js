@@ -2,7 +2,7 @@ var express = require("express"),
   bodyParser = require("body-parser"),
   logger = require("./logger/logger"),
   app = express(),
-  port = 3070;
+  port = process.env.PORT || 8080;
 
 app.use(bodyParser.json());
 
