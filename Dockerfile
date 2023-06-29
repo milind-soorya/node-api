@@ -1,5 +1,5 @@
 # from base image node
-FROM --platform=linux/arm64/v8 node:lts-alpine as build-stage
+FROM --platform=linux/amd64 node:lts-alpine as build-stage
 
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
