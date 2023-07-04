@@ -39,35 +39,17 @@ async function getToken({ loginUrl, targetUrl, email, password }) {
   await page.setRequestInterception(true);
 
   page.on("request", async (request) => {
-    const customHeaders = {
-      Accept: "application/json, text/plain, */*",
-      "Accept-Encoding": "gzip, deflate, br",
-      "Accept-Language": "",
-      Authorization: bearerToken ? `Bearer ${bearerToken}` : "",
-      "Cache-Control": "No-Cache",
-      Dnt: "1",
-      "Login-Source": "web",
-      Origin: "https://matchmaking.grip.events",
-      Pragma: "No-Cache",
-      Referer: "https://matchmaking.grip.events/fintechtalentsnorthamerica2023/event-login",
-      "Sec-Ch-Ua": '"Not.A/Brand";v="8", "Chromium";v="114", "Google Chrome";v="114"',
-      "Sec-Ch-Ua-Mobile": "?0",
-      "Sec-Ch-Ua-Platform": '"Windows"',
-      "Sec-Fetch-Dest": "empty",
-      "Sec-Fetch-Mode": "cors",
-      "Sec-Fetch-Site": "same-site",
-      "User-Agent":
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
-      "X-Grip-Version": "Web/19.1.2",
-    };
-
     try {
+      const url = request.url();
+      const searchString = "search?"; // Replace 'search-word' with the word you want to search for
+
       if (
         request.headers().hasOwnProperty("x-authorization") &&
-        request.url().startsWith("https://api-prod.grip.events/1/container/5891/search?")
+        request.url().startsWith("https://api-prod.grip.events/1/container/") &&
+        url.includes(searchString)
       ) {
         bearerToken = request.headers()["x-authorization"];
-        requestUrls.push(request.url());
+        requestUrls.push(url);
       }
 
       request.continue();
@@ -81,24 +63,25 @@ async function getToken({ loginUrl, targetUrl, email, password }) {
     waitUntil: "networkidle0",
   });
 
-  await page.waitForSelector('button[data-test="loginButton"]', {
+  await page.waitForSelector('a[data-test="loginSSOButton"]', {
     visible: true,
   });
-  await page.click('button[data-test="loginButton"]');
+  await page.click('a[data-test="loginSSOButton"]');
 
-  await page.type('input[data-test="emailInput"]', email);
-  await page.waitForSelector('button[data-test="loginButton"]', {
+  await page.waitForSelector('input[name="username"]', {
     visible: true,
   });
-  await page.click('button[data-test="loginButton"]');
 
-  await page.waitForTimeout(2000);
+  await page.type('input[name="username"]', email);
+  await page.type('input[name="password"]', password);
 
-  await page.type('input[data-test="passwordInput"]', password);
-  await page.click('button[data-test="loginButton"]');
+  // await page.click('button[name="action"]');
+  await page.evaluate(() => {
+    const loginButton = document.querySelector('button[name="action"]');
+    loginButton.click();
+  });
 
   await page.waitForNavigation({ waitUntil: "networkidle0" });
-  await page.waitForTimeout(2000);
 
   await page.goto(targetUrl, {
     waitUntil: "networkidle0",
