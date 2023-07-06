@@ -31,7 +31,7 @@ async function getToken({ loginUrl, targetUrl, email, password }) {
   // const browser = await puppeteer.launch({ headless: "new" });
   const browser = await puppeteer.launch({
     headless: "new",
-    executablePath: "/usr/bin/google-chrome",
+    // executablePath: "/usr/bin/google-chrome",
     args: ["--no-sandbox", "--disable-setuid-sandbox"],
   });
   const page = await browser.newPage();
