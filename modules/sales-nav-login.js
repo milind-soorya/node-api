@@ -24,9 +24,12 @@ async function loginToSalesNavigator(loginUrl, targetUrl, email, password) {
       const url = request.url();
       const targetUrlPattern = "https://www.linkedin.com/sales-api/salesApiLeadSearch";
       if (url.includes(targetUrlPattern)) {
+        
+        // Add the request URL and headers to the arrays
         const cookie = request.headers()["cookie"];
-        // console.log("Request cookie:", cookie);
-        console.log("Raw headers:", request.headers());
+        const csrf_token = request.headers()["csrf-token"];
+
+        requestHeaders.push(csrf_token);
         requestHeaders.push(cookie);
         requestUrls.push(request.url());
       }
